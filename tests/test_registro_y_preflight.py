@@ -8,7 +8,7 @@ CAMPANA = "JULIO – AGOSTO 2026"
 HOY = date(2026, 10, 14)
 
 
-def _evento(estado, agencia="AG. UNO", fecha=HOY, tipo=TipoAviso.RECORDATORIO, usuario="mcg22"):
+def _evento(estado, agencia="AG. UNO", fecha=HOY, tipo=TipoAviso.RECORDATORIO, usuario="tester"):
     return EventoAviso(clave=ClaveAviso.crear(CAMPANA, agencia, tipo, fecha), estado=estado, usuario=usuario)
 
 

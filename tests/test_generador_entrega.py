@@ -66,7 +66,7 @@ def _cambios():
 def test_genera_entrega_sin_tocar_el_original(original, tmp_path):
     antes = _hash(original)
     destino = tmp_path / "ENTREGA DE FONDOS ETV JA 2026 difusion.xlsx"
-    resumen = GeneradorEntrega().generar(original, destino, _cambios(), usuario="mcg22")
+    resumen = GeneradorEntrega().generar(original, destino, _cambios(), usuario="tester")
 
     assert _hash(original) == antes                                   # el original no cambia ni un byte
     assert (resumen.filas_original, resumen.filas_entrega, resumen.filas_quitadas) == (6, 4, 2)
@@ -120,7 +120,7 @@ def test_aplica_reprogramacion_conservando_el_formato(original, tmp_path):
 
 def test_deja_bitacora_que_permite_regenerar(original, tmp_path):
     destino = tmp_path / "entrega.xlsx"
-    resumen = GeneradorEntrega().generar(original, destino, _cambios(), usuario="mcg22")
+    resumen = GeneradorEntrega().generar(original, destino, _cambios(), usuario="tester")
     bitacora = Path(resumen.bitacora)
     assert bitacora.name == "entrega.cambios.json"
     de_vuelta = CambiosEntrega.desde_bitacora(bitacora)

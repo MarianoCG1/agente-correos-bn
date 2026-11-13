@@ -82,4 +82,4 @@ def directorio(agencias_path):
 
 @pytest.fixture
 def registro(tmp_path):
-    return RegistroEjecuciones(tmp_path / "registro")
+    return RegistroEjecuciones(tmp_path / "registro", usuario="tester")
