@@ -1,0 +1,32 @@
+# Datos del despliegue y del banco: NUNCA se versionan
+data/
+*.xlsx
+*.xls
+*.log
+agencias.json
+config.json
+local.json
+automatico*.json
+etv_config.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.pytest_cache/
+.venv/
+.venv*/
+
+# Empaquetado (el .spec y el .iss sí se versionan)
+build/
+dist/
+installer/Output/
+*.spec
+!installer/*.spec
+
+# Editores y sistema
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini

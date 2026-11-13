@@ -1,0 +1,8 @@
+{
+  "por_encargo_nombre": "Nombre y Apellidos de la jefatura",
+  "por_encargo_cargo": "Jefe de Caja y Valores",
+  "correos_excluidos": ["jefe@bn.com.pe"],
+  "copia_fija": ["jefe@bn.com.pe", "integrante1@bn.com.pe", "integrante2@bn.com.pe"],
+  "dominio_interno": "bn.com.pe",
+  "raiz_sugerida": "//servidor@SSL/DavWWWRoot/sitio/Documentos compartidos/PROGRAMAS SOCIALES - ETV/ENTREGA DE FONDOS"
+}

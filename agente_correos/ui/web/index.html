@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agente de Correos BN</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="logo"><img src="logo_bn.png" alt="Banco de la Nación"></div>
+    <div class="prod">Agente de Correos<small>Versión 2.0 · Caja y Valores</small></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="pie">
+      <div class="usr"><div class="avatar" id="u-ini">–</div><div><b id="u-nom">…</b><span class="sec" id="u-fecha"></span></div></div>
+      <div class="con"><span class="pto" id="u-pto"></span><span id="u-con">Conectando…</span></div>
+      <div class="sec" id="u-vig" style="padding:2px 0 0 16px"></div>
+    </div>
+  </aside>
+
+  <main class="main" id="main">
+
+    <!-- 1. CONTROL -->
+    <section class="view on" id="v-control">
+      <div class="fila">
+        <div class="grow"><h1 id="c-titulo">Control de campaña</h1><div class="sec" id="c-sub">Pensión 65 · Juntos · Contigo</div></div>
+        <button class="btn" onclick="recargarCampana(true)" title="Volver a leer el archivo y el registro">Actualizar</button>
+      </div>
+      <div id="c-aviso"></div>
+      <div class="arriba">
+        <div class="hoy" id="hoy"></div>
+        <div class="card camp" id="camp"></div>
+      </div>
+      <div class="fila filtros">
+        <div class="seg" id="seg"></div>
+        <select class="campo" id="f-etv" aria-label="ETV" onchange="pintarMatriz()">
+          <option value="">Todas las ETV</option><option>HERMES</option><option>PROSEGUR</option>
+        </select>
+        <div class="vent" id="vent">
+          <button class="btn ico" id="v-ant" onclick="moverVentana(-5)" title="5 fechas anteriores" aria-label="5 fechas anteriores">‹</button>
+          <input type="range" id="v-barra" min="1" max="1" value="1" aria-label="Mover por las fechas de la campaña" oninput="ponerVentana(+this.value)">
+          <button class="btn ico" id="v-sig" onclick="moverVentana(5)" title="5 fechas siguientes" aria-label="5 fechas siguientes">›</button>
+          <span class="sec" id="v-rango"></span>
+          <button class="btn" onclick="irAHoy()">Ir a hoy</button>
+          <button class="btn" id="v-venc" onclick="irAVencidos()" style="display:none"></button>
+        </div>
+        <span class="grow"></span>
+        <div class="busca"><span id="ico-busca"></span><input class="campo" id="f-q" placeholder="Buscar agencia" aria-label="Buscar agencia" oninput="pintarMatriz()"></div>
+      </div>
+      <div class="card tablero">
+        <div class="scroll" id="matriz"></div>
+        <div class="leyenda" id="leyenda"></div>
+      </div>
+    </section>
+    <aside class="det" id="det" aria-label="Detalle de la agencia"></aside>
+
+    <!-- 2. PREPARAR ENTREGA -->
+    <section class="view" id="v-entrega">
+      <div class="fila">
+        <div class="grow"><h1>Preparar entrega</h1>
+          <div class="sec">Arrastre el cronograma original. El original no se modifica: se genera una copia con los cambios.</div></div>
+      </div>
+      <div id="ent-1">
+        <div class="drop" id="drop" tabindex="0">
+          <div id="ico-subir"></div>
+          <b>Suelte aquí el cronograma original</b>
+          <span class="sec">Archivo Excel (.xlsx)</span>
+          <button class="btn" onclick="elegirOriginal()">Elegir archivo…</button>
+        </div>
+      </div>
+      <div id="ent-2" style="display:none;flex:1;min-height:0;flex-direction:column;gap:12px">
+        <div class="card ent-resumen" id="ent-resumen"></div>
+        <div class="ent-cols">
+          <div class="card tablero">
+            <div class="fila ent-cab">
+              <div class="grow"><h2>Puntos suspendidos</h2><div class="sec" id="ent-sus-n"></div></div>
+              <div class="busca"><span id="ico-busca3"></span><input class="campo" id="ent-q" placeholder="Buscar punto o agencia" oninput="pintarPuntos()"></div>
+            </div>
+            <div class="scroll" id="ent-puntos"></div>
+          </div>
+          <div class="card ent-lado">
+            <h2>Origen del cambio</h2>
+            <p class="sec">Se anota junto a cada punto. Por ejemplo: «correo de Operaciones del 10/09».</p>
+            <input class="campo" id="ent-origen" placeholder="Correo, oficio o fecha" style="width:100%">
+            <h2 style="margin-top:18px">Fechas reprogramadas</h2>
+            <p class="sec">Elija un punto en la lista y use «Reprogramar».</p>
+            <div id="ent-reprog"></div>
+          </div>
+        </div>
+        <div class="card accion">
+          <span class="sec grow" id="ent-nota"></span>
+          <button class="btn" onclick="entCancelar()">Cancelar</button>
+          <button class="btn pri" id="ent-generar" onclick="entGenerar()">Generar y guardar como…</button>
+        </div>
+      </div>
+      <div id="ent-3" style="display:none"></div>
+    </section>
+
+    <!-- 3. REVISIÓN PREVIA -->
+    <section class="view" id="v-revision">
+      <div class="fila">
+        <button class="btn ico" aria-label="Volver al tablero" onclick="ir('control')" id="rev-volver"></button>
+        <div class="grow"><h1>Revisión previa</h1><div class="sec" id="rev-sub"></div></div>
+        <div class="pasos"><span class="on"><i>1</i>Revisar</span><u></u><span><i>2</i>Enviar</span><u></u><span><i>3</i>Verificar</span></div>
+      </div>
+      <div class="fila grow" style="align-items:stretch;min-height:0">
+        <div class="card tablero" style="flex:1.35"><div class="scroll" id="rev-tabla"></div></div>
+        <div class="card mail" style="flex:1" id="rev-mail"></div>
+      </div>
+      <div class="card accion">
+        <span class="nota" id="rev-nota"></span>
+        <span class="sec grow" id="rev-info"></span>
+        <button class="btn" onclick="ir('control')">Cancelar</button>
+        <button class="btn" id="btn-prueba" onclick="enviarPrueba()">Enviarme una prueba</button>
+        <button class="btn" id="btn-borr" onclick="confirmar('borrador')">Dejar como borradores</button>
+        <button class="btn pri" id="btn-env" onclick="confirmar('enviar')"></button>
+      </div>
+    </section>
+
+    <!-- 4. RESULTADO -->
+    <section class="view" id="v-resultado">
+      <div class="fila">
+        <div class="grow"><h1 id="res-titulo">Resultado</h1><div class="sec" id="res-sub"></div></div>
+        <div class="pasos"><span class="ok"><i>1</i>Revisar</span><u></u><span class="ok"><i>2</i>Enviar</span><u></u><span class="on"><i>3</i>Verificar</span></div>
+      </div>
+      <div id="res-anular"></div>
+      <div class="tres" id="res-kpis"></div>
+      <div class="card tablero"><div class="scroll" id="res-tabla"></div></div>
+      <div class="fila">
+        <span class="sec grow">El detalle quedó registrado en el Historial.</span>
+        <button class="btn" onclick="ir('historial')">Ver historial</button>
+        <button class="btn pri" onclick="recargarCampana(true); ir('control')">Volver al control de campaña</button>
+      </div>
+    </section>
+
+    <!-- 5. HISTORIAL -->
+    <section class="view" id="v-historial">
+      <div class="fila">
+        <div class="grow"><h1>Historial</h1><div class="sec" id="hist-n"></div></div>
+        <select class="campo" id="h-ag" aria-label="Agencia" onchange="pintarHistorial()"></select>
+        <select class="campo" id="h-res" aria-label="Resultado" onchange="pintarHistorial()">
+          <option value="">Todos los resultados</option><option value="env">Enviado</option><option value="borr">Borrador</option>
+          <option value="omit">Omitido o anulado</option><option value="bloq">Bloqueado</option><option value="dec">Con problema</option>
+        </select>
+        <div class="busca"><span id="ico-busca2"></span><input class="campo" id="h-q" placeholder="Buscar" aria-label="Buscar en el historial" oninput="pintarHistorial()"></div>
+      </div>
+      <div class="card tablero"><div class="scroll" id="hist-tabla"></div></div>
+    </section>
+
+    <!-- 6. CONFIGURACIÓN -->
+    <section class="view" id="v-config">
+      <div class="fila">
+        <div class="grow"><h1>Configuración</h1><div class="sec" id="cfg-sub">Cada cambio queda registrado con quién y cuándo.</div></div>
+        <button class="btn pri" id="cfg-guardar" onclick="guardarCfg()">Guardar cambios</button>
+      </div>
+      <div class="seg" id="cfg-tabs" style="align-self:flex-start"></div>
+      <div class="cfg grow" id="cfg"></div>
+    </section>
+
+    <div class="velo" id="velo" onclick="if(event.target===this)cerrarModal()">
+      <div class="dlg" role="dialog" aria-modal="true" id="dlg"></div>
+    </div>
+    <div class="auto-banner" id="auto-banner" role="alert" aria-live="assertive"></div>
+    <div class="toast" id="toast" role="status"></div>
+  </main>
+</div>
+<script>
+  // Fuera de pywebview (para revisar la interfaz en un navegador) se usa una Api de ejemplo: index.html?dev
+  if (location.search.indexOf('dev') >= 0) document.write('<script src="dev_api.js"><\/script>');
+</script>
+<script src="app.js"></script>
+</body>
+</html>
